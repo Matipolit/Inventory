@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block title %}Dodaj nową kategorię{% endblock title
 %} {% block content %}
 <h1>Dodaj nową kategorię</h1>
-<form action="/web/categories/add" method="post">
+<form action="{{ base_path }}/web/categories/add" method="post">
     <div>
         <label for="name">Nazwa kategorii:</label>
         <input type="text" id="name" name="name" required />
@@ -19,5 +19,5 @@
         <button class="btn" style="margin: 12px 0" type="submit">Dodaj Kategorię</button>
     </div>
 </form>
-<p><a href="/web">Powrót do inwentarza</a></p>
+<p><a href="{{ base_path }}/web">Powrót do inwentarza</a></p>
 {% endblock content %}

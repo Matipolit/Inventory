@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block title %}Dodaj nowy przedmiot{% endblock title
 %} {% block content %}
 <h1>Dodaj nowy przedmiot inwentarza</h1>
-<form action="/web/items/add" method="post">
+<form action="{{ base_path }}/web/items/add" method="post">
     <div>
         <label for="name">Nazwa przedmiotu:</label>
         <input type="text" id="name" name="name" required />
@@ -45,5 +45,5 @@
         </button>
     </div>
 </form>
-<p><a href="/web">Powrót do inwentarza</a></p>
+<p><a href="{{ base_path }}/web">Powrót do inwentarza</a></p>
 {% endblock content %}

@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block title %}Edytuj {{ item.name }}{% endblock
 title %} {% block content %}
 <h1>Edytuj przedmiot: {{ item.name }}</h1>
-<form action="/web/items/edit/{{ item.id }}" method="post">
+<form action="{{ base_path }}/web/items/edit/{{ item.id }}" method="post">
     <div>
         <label for="name">Nazwa przedmiotu:</label>
         <input
@@ -47,5 +47,5 @@ title %} {% block content %}
         <button type="submit">Zaktualizuj przedmiot</button>
     </div>
 </form>
-<p><a href="/web">Powrót do inwentarza</a></p>
+<p><a href="{{ base_path }}/web">Powrót do inwentarza</a></p>
 {% endblock content %}

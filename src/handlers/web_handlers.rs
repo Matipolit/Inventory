@@ -89,6 +89,7 @@ pub async fn root_handler(
     context.insert("user", &user);
     context.insert("group_by_category", &group_by_category);
     context.insert("categories", &categories);
+    context.insert("base_path", &state.base_path);
 
     if group_by_category {
         let mut categorized_map: HashMap<i32, CategoryWithItems> = HashMap::new();
@@ -149,6 +150,7 @@ pub async fn show_add_item_form(
     let mut context = Context::new();
     context.insert("notifications", &notifications);
     context.insert("categories", &categories);
+    context.insert("base_path", &state.base_path);
     let rendered = state.tera.render("add_item.html", &context)?;
     Ok(Html(rendered))
 }
@@ -164,7 +166,8 @@ pub async fn add_item_handler(
         .ok_or_else(|| AppError::BadRequest("Authentication required".into()))?;
 
     db_queries::create_item(&state.db_pool, user_id, payload).await?;
-    Ok(Redirect::to("/web"))
+    let redirect_url = format!("{}/web", &state.base_path);
+    Ok(Redirect::to(&redirect_url))
 }
 
 pub async fn add_category_handler(
@@ -178,7 +181,8 @@ pub async fn add_category_handler(
         .ok_or_else(|| AppError::BadRequest("Authentication required".into()))?;
 
     db_queries::create_category(&state.db_pool, user_id, payload).await?;
-    Ok(Redirect::to("/web"))
+    let redirect_url = format!("{}/web", &state.base_path);
+    Ok(Redirect::to(&redirect_url))
 }
 
 pub async fn show_add_category_form(
@@ -193,6 +197,7 @@ pub async fn show_add_category_form(
     let notifications = get_notifications(&state.db_pool, user_id).await;
     let mut context = Context::new();
     context.insert("notifications", &notifications);
+    context.insert("base_path", &state.base_path);
     let rendered = state.tera.render("add_category.html", &context)?;
     Ok(Html(rendered))
 }
@@ -201,7 +206,9 @@ pub async fn show_add_category_form(
 pub async fn show_signup_form(
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
-    let rendered = state.tera.render("signup.html", &Context::new())?;
+    let mut context = Context::new();
+    context.insert("base_path", &state.base_path);
+    let rendered = state.tera.render("signup.html", &context)?;
     Ok(Html(rendered))
 }
 
@@ -219,14 +226,17 @@ pub async fn signup_handler(
         &hashed_password_string,
     )
     .await?;
-    Ok(Redirect::to("/web/login"))
+    let redirect_url = format!("{}/web/login", &state.base_path);
+    Ok(Redirect::to(&redirect_url))
 }
 
 /// GET /login
 pub async fn show_login_form(
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
-    let rendered = state.tera.render("login.html", &Context::new())?;
+    let mut context = Context::new();
+    context.insert("base_path", &state.base_path);
+    let rendered = state.tera.render("login.html", &context)?;
     Ok(Html(rendered))
 }
 
@@ -248,19 +258,24 @@ pub async fn login_handler(
             .http_only(true);
         // .secure(true) // Uncomment if served over HTTPS
         let jar = jar.add(session_cookie);
-        Ok((jar, Redirect::to("/web")))
+        let redirect_url = format!("{}/web", &state.base_path);
+        Ok((jar, Redirect::to(&redirect_url)))
     } else {
         Err(AppError::BadRequest("Nieprawidłowe dane logowania".into()))
     }
 }
 
 /// GET /logout
-pub async fn logout_handler(jar: CookieJar) -> Result<(CookieJar, Redirect), AppError> {
+pub async fn logout_handler(
+    State(state): State<Arc<AppState>>,
+    jar: CookieJar,
+) -> Result<(CookieJar, Redirect), AppError> {
     // Remove the cookie by setting its path and making it expire.
     // axum-extra's `remove` method sets Max-Age=0 and clears the value.
     // Ensure the path matches the one used during cookie creation.
     let jar = jar.remove(Cookie::build("session").path("/").build());
-    Ok((jar, Redirect::to("/web/login")))
+    let redirect_url = format!("{}/web/login", &state.base_path);
+    Ok((jar, Redirect::to(&redirect_url)))
 }
 
 pub async fn show_edit_item_form(
@@ -283,6 +298,7 @@ pub async fn show_edit_item_form(
     context.insert("notifications", &notifications);
     context.insert("categories", &categories);
     context.insert("selected_category", &item.category.map(|c| c.id));
+    context.insert("base_path", &state.base_path);
     let rendered = state.tera.render("edit_item.html", &context)?;
     Ok(Html(rendered))
 }
@@ -300,7 +316,8 @@ pub async fn edit_item_handler(
         .ok_or_else(|| AppError::BadRequest("Authentication required".into()))?;
 
     db_queries::update_item(&state.db_pool, user_id, item_id, payload).await?;
-    Ok(Redirect::to("/web"))
+    let redirect_url = format!("{}/web", &state.base_path);
+    Ok(Redirect::to(&redirect_url))
 }
 
 pub async fn purchase_item_handler(
@@ -315,7 +332,8 @@ pub async fn purchase_item_handler(
         .ok_or_else(|| AppError::BadRequest("Authentication required".into()))?;
 
     db_queries::purchase_item(&state.db_pool, user_id, item_id, payload).await?;
-    Ok(Redirect::to("/web"))
+    let redirect_url = format!("{}/web", &state.base_path);
+    Ok(Redirect::to(&redirect_url))
 }
 
 pub async fn use_item_handler(
@@ -329,7 +347,8 @@ pub async fn use_item_handler(
         .ok_or_else(|| AppError::BadRequest("Authentication required".into()))?;
 
     db_queries::use_item(&state.db_pool, user_id, item_id).await?;
-    Ok(Redirect::to("/web"))
+    let redirect_url = format!("{}/web", &state.base_path);
+    Ok(Redirect::to(&redirect_url))
 }
 
 pub async fn delete_item_handler(
@@ -346,5 +365,6 @@ pub async fn delete_item_handler(
     if affected_rows == 0 {
         return Err(AppError::ItemNotFound);
     }
-    Ok(Redirect::to("/web"))
+    let redirect_url = format!("{}/web", &state.base_path);
+    Ok(Redirect::to(&redirect_url))
 }

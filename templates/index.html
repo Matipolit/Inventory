@@ -11,10 +11,10 @@
     <label for="group_by_categories">Grupuj po kategoriach</label><br>
 {% endif %}
 <a
-    style="margin: 12px 0px"
-    class="btn btn-edit"
-    href="/web/categories/add"
-    >Nowa kategoria</a
+style="margin: 12px 0px"
+class="btn btn-edit"
+href="{{ base_path }}/web/categories/add"
+>Nowa kategoria</a
 >
 </div>
 
@@ -45,7 +45,7 @@
                                 <td>{{ item.restock_threshold }}</td>
                                 <td>
                                     <div style="display: flex; gap: 6px; align-items: center; align-content: stretch; flex-wrap: wrap;">
-                                        <form action="/web/items/use/{{ item.id }}" method="post" style="display:inline;">
+                                        <form action="{{ base_path }}/web/items/use/{{ item.id }}" method="post" style="display:inline;">
                                             <button class="btn-action" type="submit">
                                                 {{ icons::svg(name="use", width="20", height="20", aria_label="Use Item", color="#FFFFFF") }}<span>Użyj</span></button>
                                         </form>
@@ -55,7 +55,7 @@
                                                 <span>Dodaj <b>{{ item.name }}</b></span>
                                                 <button class="btn-danger" autofocus>Zamknij</button>
                                             </div>
-                                            <form action="/web/items/purchase/{{ item.id }}" method="post">
+                                            <form action="{{ base_path }}/web/items/purchase/{{ item.id }}" method="post">
                                                 <div>
                                                     <label for="quantity">Ilość:</label>
                                                     <input type="number" id="quantity" name="quantity" value="{{ item.quantity }}" min="1" required>
@@ -69,11 +69,11 @@
                                             {{ icons::svg(name="add", width="20", height="20", aria_label="Delete Item", color="#FFFFFF") }}<span>Dodaj</span>
                                         </button>
 
-                                        <a class="btn btn-edit" href="/web/items/edit/{{ item.id }}">
+                                        <a class="btn btn-edit" href="{{ base_path }}/web/items/edit/{{ item.id }}">
                                             {{ icons::svg(name="edit", width="20", height="20", aria_label="Edit Item", color="#FFFFFF") }}<span>Edytuj</span>
                                         </a>
 
-                                        <form action="/web/items/delete/{{ item.id }}" method="post" style="display:inline;">
+                                        <form action="{{ base_path }}/web/items/delete/{{ item.id }}" method="post" style="display:inline;">
                                             <button class="btn-danger" type="submit" onclick="return confirm('Czy na pewno chcesz usunąć {{ item.name }}?');">
                                                 {{ icons::svg(name="trash", width="20", height="20", aria_label="Delete Item", color="#FFFFFF") }}<span>Usuń</span>
                                             </button>
@@ -95,7 +95,7 @@
                             <td>{{ item.restock_threshold }}</td>
                             <td>
                                 <div style="display: flex; gap: 6px; align-items: center; align-content: stretch; flex-wrap: wrap;">
-                                    <form action="/web/items/use/{{ item.id }}" method="post" style="display:inline;">
+                                    <form action="{{ base_path }}/web/items/use/{{ item.id }}" method="post" style="display:inline;">
                                         <button class="btn-action" type="submit">
                                             {{ icons::svg(name="use", width="20", height="20", aria_label="Use Item", color="#FFFFFF") }}<span>Użyj</span></button>
                                     </form>
@@ -105,7 +105,7 @@
                                             <span>Dodaj <b>{{ item.name }}</b></span>
                                             <button class="btn-danger" autofocus>Zamknij</button>
                                         </div>
-                                        <form action="/web/items/purchase/{{ item.id }}" method="post">
+                                        <form action="{{ base_path }}/web/items/purchase/{{ item.id }}" method="post">
                                             <div>
                                                 <label for="quantity">Ilość:</label>
                                                 <input type="number" id="quantity" name="quantity" value="{{ item.quantity }}" min="1" required>
@@ -119,11 +119,11 @@
                                         {{ icons::svg(name="add", width="20", height="20", aria_label="Delete Item", color="#FFFFFF") }}<span>Dodaj</span>
                                     </button>
 
-                                    <a class="btn btn-edit" href="/web/items/edit/{{ item.id }}">
+                                    <a class="btn btn-edit" href="{{ base_path }}/web/items/edit/{{ item.id }}">
                                         {{ icons::svg(name="edit", width="20", height="20", aria_label="Edit Item", color="#FFFFFF") }}<span>Edytuj</span>
                                     </a>
 
-                                    <form action="/web/items/delete/{{ item.id }}" method="post" style="display:inline;">
+                                    <form action="{{ base_path }}/web/items/delete/{{ item.id }}" method="post" style="display:inline;">
                                         <button class="btn-danger" type="submit" onclick="return confirm('Czy na pewno chcesz usunąć {{ item.name }}?');">
                                             {{ icons::svg(name="trash", width="20", height="20", aria_label="Delete Item", color="#FFFFFF") }}<span>Usuń</span>
                                         </button>
@@ -148,7 +148,7 @@
                     <td>{{ item.restock_threshold }}</td>
                     <td>
                         <div style="display: flex; gap: 6px; align-items: center; align-content: stretch; flex-wrap: wrap;">
-                            <form action="/web/items/use/{{ item.id }}" method="post" style="display:inline;">
+                            <form action="{{ base_path }}/web/items/use/{{ item.id }}" method="post" style="display:inline;">
                                 <button class="btn-action" type="submit">
                                     {{ icons::svg(name="use", width="20", height="20", aria_label="Use Item", color="#FFFFFF") }}<span>Użyj</span></button>
                             </form>
@@ -158,7 +158,7 @@
                                     <span>Dodaj <b>{{ item.name }}</b></span>
                                     <button class="btn-danger" autofocus>Zamknij</button>
                                 </div>
-                                <form action="/web/items/purchase/{{ item.id }}" method="post">
+                                <form action="{{ base_path }}/web/items/purchase/{{ item.id }}" method="post">
                                     <div>
                                         <label for="quantity">Ilość:</label>
                                         <input type="number" id="quantity" name="quantity" value="{{ item.quantity }}" min="1" required>
@@ -172,11 +172,11 @@
                                 {{ icons::svg(name="add", width="20", height="20", aria_label="Delete Item", color="#FFFFFF") }}<span>Dodaj</span>
                             </button>
 
-                            <a class="btn btn-edit" href="/web/items/edit/{{ item.id }}">
+                            <a class="btn btn-edit" href="{{ base_path }}/web/items/edit/{{ item.id }}">
                                 {{ icons::svg(name="edit", width="20", height="20", aria_label="Edit Item", color="#FFFFFF") }}<span>Edytuj</span>
                             </a>
 
-                            <form action="/web/items/delete/{{ item.id }}" method="post" style="display:inline;">
+                            <form action="{{ base_path }}/web/items/delete/{{ item.id }}" method="post" style="display:inline;">
                                 <button class="btn-danger" type="submit" onclick="return confirm('Czy na pewno chcesz usunąć {{ item.name }}?');">
                                     {{ icons::svg(name="trash", width="20", height="20", aria_label="Delete Item", color="#FFFFFF") }}<span>Usuń</span>
                                 </button>
@@ -192,7 +192,7 @@
     <a
         style="margin-top: 12px"
         class="btn btn-edit"
-        href="/web/items/add"
+        href="{{ base_path }}/web/items/add"
         >Nowy przedmiot</a
     >
 {% else %}
@@ -201,7 +201,7 @@
         <a
             style="margin-top: 12px"
             class="btn btn-edit"
-            href="/web/items/add"
+            href="{{ base_path }}/web/items/add"
             >Dodaj przedmiot!</a
         ></p>
     {% endif %}

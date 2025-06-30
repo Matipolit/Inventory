@@ -5,14 +5,14 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{% block title %}Inwentarz{% endblock title %}</title>
-        <link rel="stylesheet" href="/static/style.css" />
-        <script src="/static/script.js"></script>
+        <link rel="stylesheet" href="{{ base_path }}/static/style.css" />
+        <script src="{{ base_path }}/static/script.js"></script>
     </head>
     <body>
         {% include "partials/_svg_sprite.html" ignore missing %}
         <nav>
             {% if user %} Zalogowano jako {{ user.name }}
-            <a href="/web/logout">Wyloguj się</a>
+            <a href="{{ base_path }}/web/logout">Wyloguj się</a>
             {% endif %}
         </nav>
         <main>

@@ -16,26 +16,6 @@ use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{filter::EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
-// Auth guard for web routes
-async fn auth(req: axum::http::Request<Body>, next: Next) -> impl IntoResponse {
-    let path = req.uri().path();
-    // allow access to login and signup without auth
-    if path.starts_with("/web/login") || path.starts_with("/web/signup") {
-        next.run(req).await
-    } else {
-        let is_auth = req
-            .headers()
-            .get("cookie")
-            .and_then(|h| h.to_str().ok())
-            .map_or(false, |s| s.contains("session="));
-        if is_auth {
-            next.run(req).await
-        } else {
-            Redirect::to("/web/login").into_response()
-        }
-    }
-}
-
 // enable cookies for session management
 use tower::ServiceBuilder;
 
@@ -50,6 +30,40 @@ use handlers::{api_handlers, web_handlers};
 pub struct AppState {
     pub tera: Arc<Tera>,
     pub db_pool: PgPool,
+    pub base_path: String,
+}
+
+// Auth guard for web routes
+async fn auth(
+    State(state): State<Arc<AppState>>,
+    req: axum::http::Request<Body>,
+    next: Next,
+) -> impl IntoResponse {
+    let path = req.uri().path();
+    let base_path = &state.base_path;
+    let login_path = format!("{}/web/login", base_path);
+    let signup_path = format!("{}/web/signup", base_path);
+    let static_path = format!("{}/static", base_path);
+
+    // allow access to login and signup without auth
+    if path == "/"
+        || path.starts_with(&login_path)
+        || path.starts_with(&signup_path)
+        || path.starts_with(&static_path)
+    {
+        next.run(req).await
+    } else {
+        let is_auth = req
+            .headers()
+            .get("cookie")
+            .and_then(|h| h.to_str().ok())
+            .map_or(false, |s| s.contains("session="));
+        if is_auth {
+            next.run(req).await
+        } else {
+            Redirect::to(&login_path).into_response()
+        }
+    }
 }
 
 async fn health_check() -> impl IntoResponse {
@@ -68,9 +82,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let tera = Arc::new(Tera::new("templates/**/*")?);
+    let tera = Tera::new("templates/**/*")?;
     let db_pool = db::create_pool().await?;
-    let shared_state = Arc::new(AppState { tera, db_pool });
+
+    let run_on_subpath =
+        env::var("RUN_ON_SUBPATH").unwrap_or_else(|_| "false".to_string()) == "true";
+    let base_path = if run_on_subpath {
+        "/inventory".to_string()
+    } else {
+        "".to_string()
+    };
+
+    let shared_state = Arc::new(AppState {
+        tera: Arc::new(tera),
+        db_pool,
+        base_path,
+    });
 
     let static_service = ServeDir::new("static");
 
@@ -120,17 +147,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route(
             "/web/items/purchase/{id}",
             post(web_handlers::purchase_item_handler),
-        )
-        .layer(middleware::from_fn(auth));
+        );
 
-    let app = Router::new()
-        .merge(web)
-        .nest("/api", api_router)
-        .route("/health", get(health_check))
-        .nest_service("/static", static_service)
-        .with_state(shared_state)
-        .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()))
-        .fallback(|| async { (StatusCode::NOT_FOUND, "Route Not Found") });
+    let app = if env::var("RUN_ON_SUBPATH").unwrap_or_else(|_| "false".to_string()) == "true" {
+        Router::new().nest(
+            "/inventory",
+            Router::new()
+                .merge(web)
+                .nest("/api", api_router)
+                .nest_service("/static", static_service)
+                .layer(middleware::from_fn_with_state(shared_state.clone(), auth)),
+        )
+    } else {
+        Router::new()
+            .merge(web)
+            .nest("/api", api_router)
+            .nest_service("/static", static_service)
+            .layer(middleware::from_fn_with_state(shared_state.clone(), auth))
+    }
+    .route("/health", get(health_check))
+    .with_state(shared_state)
+    .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()))
+    .fallback(|| async { (StatusCode::NOT_FOUND, "Route Not Found") });
 
     let port: u16 = env::var("APP_PORT")
         .unwrap_or_else(|_| "3000".into())
