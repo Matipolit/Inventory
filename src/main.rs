@@ -136,9 +136,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap_or_else(|_| "3000".into())
         .parse()?;
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
-    tracing::info!("listening on {}", addr);
 
     let listener = TcpListener::bind(addr).await?;
+
+    println!(
+        r#"
+        __________               _______ _      ________________ _______
+        \__   __( (    /|\     /(  ____ ( (    /\__   __(  ___  (  ____ |\     /|
+           ) (  |  \  ( | )   ( | (    \|  \  ( |  ) (  | (   ) | (    )( \   / )
+           | |  |   \ | | |   | | (__   |   \ | |  | |  | |   | | (____)|\ (_) /
+           | |  | (\ \) ( (   ) |  __)  | (\ \) |  | |  | |   | |     __) \   /
+           | |  | | \   |\ \_/ /| (     | | \   |  | |  | |   | | (\ (     ) (
+        ___) (__| )  \  | \   / | (____/| )  \  |  | |  | (___) | ) \ \__  | |
+        \_______|/    )_)  \_/  (_______|/    )_)  )_(  (_______|/   \__/  \_/
+
+
+        "#
+    );
+    tracing::info!("listening on {}", addr);
     serve(listener, app).await?;
 
     Ok(())
