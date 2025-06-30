@@ -1,0 +1,28 @@
+{% macro svg(name, class="", width="24", height="24", aria_label="", color="#000000") %}
+<svg
+    class="icon icon-{{ name }} {{ class }}"
+    width="{{ width }}"
+    height="{{ height }}"
+    aria-label="{{ aria_label }}"
+    role="img"
+    focusable="false"
+>
+    <g fill="{{ color }}"
+
+        fill-rule="nonzero"
+        stroke="none"
+        stroke-width="1"
+        stroke-linecap="butt"
+        stroke-linejoin="miter"
+        stroke-miterlimit="10"
+        stroke-dasharray=""
+        stroke-dashoffset="0"
+        font-family="none"
+        font-weight="none"
+        font-size="none"
+        text-anchor="none"
+        style="mix-blend-mode: normal"
+>
+    <use xlink:href="#icon-{{ name }}"></use>
+</svg>
+{% endmacro svg %}

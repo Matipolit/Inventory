@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block title %}Dodaj nowy przedmiot{% endblock title
+%} {% block content %}
+<h1>Dodaj nowy przedmiot inwentarza</h1>
+<form action="/web/items/add" method="post">
+    <div>
+        <label for="name">Nazwa przedmiotu:</label>
+        <input type="text" id="name" name="name" required />
+    </div>
+    <div>
+        <label for="quantity">Ilość:</label>
+        <input
+            type="number"
+            id="quantity"
+            name="quantity"
+            value="1"
+            min="0"
+            required
+        />
+    </div>
+    <div>
+        <label for="restock_threshold"
+            >Próg uzupełnienia (poniżej progu wyświetla się
+            powiadomienie):</label
+        >
+        <input
+            type="number"
+            id="restock_threshold"
+            name="restock_threshold"
+            value="1"
+            min="0"
+        />
+    </div>
+    <div>
+        <label for="category_id"> Kategoria </label>
+        <select name="category_id" id="category_id">
+            <option value="">Brak kategorii</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <button style="margin: 12px 0px" class="btn btn-edit" type="submit">
+            Dodaj przedmiot
+        </button>
+    </div>
+</form>
+<p><a href="/web">Powrót do inwentarza</a></p>
+{% endblock content %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %} {% block title %}Edytuj {{ item.name }}{% endblock
+title %} {% block content %}
+<h1>Edytuj przedmiot: {{ item.name }}</h1>
+<form action="/web/items/edit/{{ item.id }}" method="post">
+    <div>
+        <label for="name">Nazwa przedmiotu:</label>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            value="{{ item.name }}"
+            required
+        />
+    </div>
+    <div>
+        <label for="quantity">Ilość:</label>
+        <input
+            type="number"
+            id="quantity"
+            name="quantity"
+            value="{{ item.quantity }}"
+            min="0"
+            required
+        />
+    </div>
+    <div>
+        <label for="restock_threshold">Próg uzupełnienia:</label>
+        <input
+            type="number"
+            id="restock_threshold"
+            name="restock_threshold"
+            value="{{ item.restock_threshold }}"
+            min="0"
+        />
+    </div>
+
+    <div>
+        <label for="category_id"> Kategoria </label>
+        <select name="category_id" id="category_id">
+            <option value="" {% if not selected_category %}selected{% endif %}>Brak kategorii</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}" {% if selected_category == category.id %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <button type="submit">Zaktualizuj przedmiot</button>
+    </div>
+</form>
+<p><a href="/web">Powrót do inwentarza</a></p>
+{% endblock content %}
