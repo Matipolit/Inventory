@@ -18,14 +18,14 @@ href="{{ base_path }}/web/categories/add"
 >
 </div>
 
-{% if items or (group_by_category and (grouped_items.categorized or grouped_items.uncategorized)) %}
+{% if item_amount > 0 %}
     <table>
         <thead>
             <tr>
+                <th>Nazwa</th>
                 {% if not group_by_category %}
                 <th>Kategoria</th>
                 {% endif %}
-                <th>Nazwa</th>
                 <th>Ilość</th>
                 <th>Próg uzupełnienia</th>
                 <th>Akcje</th>
@@ -136,14 +136,14 @@ href="{{ base_path }}/web/categories/add"
             {% else %}
                 {% for item in items %}
                 <tr{% if item.quantity < item.restock_threshold %} class="low-stock"{% endif %}>
+                    <td>{{ item.name }}</td>
                     <td>
                         {% if item.category %}
                             {{ item.category.name }}
                         {% else %}
-                            brak
+                            -
                         {% endif %}
                     </td>
-                    <td>{{ item.name }}</td>
                     <td>{{ item.quantity }}</td>
                     <td>{{ item.restock_threshold }}</td>
                     <td>
@@ -196,15 +196,13 @@ href="{{ base_path }}/web/categories/add"
         >Nowy przedmiot</a
     >
 {% else %}
-    {% if categories %}
-        <p>Brak przedmiotów w inwentarzu.
-        <a
-            style="margin-top: 12px"
-            class="btn btn-edit"
-            href="{{ base_path }}/web/items/add"
-            >Dodaj przedmiot!</a
-        ></p>
-    {% endif %}
+    <p>Brak przedmiotów w inwentarzu.
+    <a
+        style="margin-top: 12px"
+        class="btn btn-edit"
+        href="{{ base_path }}/web/items/add"
+        >Dodaj przedmiot!</a
+    ></p>
 {% endif %}
 
 <script>

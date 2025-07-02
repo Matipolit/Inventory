@@ -65,6 +65,8 @@ button {
     border: none;
     cursor: pointer;
     font-family: sans-serif;
+    font-size: 14px;
+    text-decoration: none;
 }
 
 .btn-danger {

@@ -90,6 +90,7 @@ pub async fn root_handler(
     context.insert("group_by_category", &group_by_category);
     context.insert("categories", &categories);
     context.insert("base_path", &state.base_path);
+    context.insert("item_amount", &items.len());
 
     if group_by_category {
         let mut categorized_map: HashMap<i32, CategoryWithItems> = HashMap::new();

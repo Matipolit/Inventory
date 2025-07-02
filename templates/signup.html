@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block title %}Sign Up{% endblock title %} {% block
 content %}
 <h1>Zarejestruj się</h1>
-<form action="/web/signup" method="post">
+<form action="{{ base_path }}/web/signup" method="post">
     <div>
         <label for="name">Imię:</label>
         <input type="text" id="name" name="name" required />
@@ -18,5 +18,5 @@ content %}
         <button type="submit">Zarejestruj się</button>
     </div>
 </form>
-<p>Masz już konto? <a href="/web/login">Zaloguj się tutaj</a>.</p>
+<p>Masz już konto? <a href="{{ base_path }}/web/login">Zaloguj się tutaj</a>.</p>
 {% endblock content %}

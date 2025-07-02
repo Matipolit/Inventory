@@ -1,12 +1,11 @@
 use axum::body::{Body, HttpBody};
 use axum::extract::State;
-use axum::http::StatusCode;
+use axum::http::{Request, StatusCode, Uri};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;
 use axum::response::Redirect;
 use axum::routing::{delete, get, post, put};
 use axum::{Router, serve};
-use axum_extra::extract::cookie::CookieJar;
 use dotenvy::dotenv;
 use sqlx::PgPool;
 use std::{env, net::SocketAddr, sync::Arc};
@@ -15,9 +14,6 @@ use tokio::net::TcpListener;
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{filter::EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
-
-// enable cookies for session management
-use tower::ServiceBuilder;
 
 mod db;
 mod errors;
@@ -33,36 +29,46 @@ pub struct AppState {
     pub base_path: String,
 }
 
+async fn strip_trailing_slash(req: Request<Body>, next: Next) -> impl IntoResponse {
+    let uri = req.uri();
+    let path = uri.path();
+
+    if path.len() > 1 && path.ends_with('/') {
+        // remove the trailing slash and redirect
+        let new_path = path.trim_end_matches('/');
+        let new_uri_string = if let Some(query) = uri.query() {
+            format!("{}?{}", new_path, query)
+        } else {
+            new_path.to_string()
+        };
+
+        // Use a permanent redirect
+        return Redirect::permanent(&new_uri_string).into_response();
+    }
+
+    // If no trailing slash, just continue
+    next.run(req).await
+}
+
 // Auth guard for web routes
 async fn auth(
     State(state): State<Arc<AppState>>,
     req: axum::http::Request<Body>,
     next: Next,
 ) -> impl IntoResponse {
-    let path = req.uri().path();
     let base_path = &state.base_path;
     let login_path = format!("{}/web/login", base_path);
-    let signup_path = format!("{}/web/signup", base_path);
-    let static_path = format!("{}/static", base_path);
 
-    // allow access to login and signup without auth
-    if path == "/"
-        || path.starts_with(&login_path)
-        || path.starts_with(&signup_path)
-        || path.starts_with(&static_path)
-    {
+    let is_auth = req
+        .headers()
+        .get("cookie")
+        .and_then(|h| h.to_str().ok())
+        .map_or(false, |s| s.contains("session="));
+
+    if is_auth {
         next.run(req).await
     } else {
-        let is_auth = req
-            .headers()
-            .get("cookie")
-            .and_then(|h| h.to_str().ok())
-            .map_or(false, |s| s.contains("session="));
-        if is_auth {
-            next.run(req).await
-        } else {
-            Redirect::to(&login_path).into_response()
-        }
+        Redirect::to(&login_path).into_response()
     }
 }
 
@@ -101,7 +107,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let static_service = ServeDir::new("static");
 
-    let api_router = Router::new()
+    let api_routes = Router::new()
         .route(
             "/items",
             get(api_handlers::list_items_api).post(api_handlers::create_item_api),
@@ -114,40 +120,47 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .route("/notifications", get(api_handlers::get_notifications_api));
 
-    // protected web routes
-    let web = Router::new()
+    // Routes that require authentication
+    let protected_web_routes = Router::new()
         .route("/", get(web_handlers::root_handler))
-        .route("/web", get(web_handlers::root_handler))
+        .route("/logout", get(web_handlers::logout_handler))
         .route(
-            "/web/signup",
-            get(web_handlers::show_signup_form).post(web_handlers::signup_handler),
-        )
-        .route(
-            "/web/login",
-            get(web_handlers::show_login_form).post(web_handlers::login_handler),
-        )
-        .route("/web/logout", get(web_handlers::logout_handler))
-        .route(
-            "/web/categories/add",
+            "/categories/add",
             get(web_handlers::show_add_category_form).post(web_handlers::add_category_handler),
         )
         .route(
-            "/web/items/add",
+            "/items/add",
             get(web_handlers::show_add_item_form).post(web_handlers::add_item_handler),
         )
         .route(
-            "/web/items/edit/{id}",
+            "/items/edit/{id}",
             get(web_handlers::show_edit_item_form).post(web_handlers::edit_item_handler),
         )
         .route(
-            "/web/items/delete/{id}",
+            "/items/delete/{id}",
             post(web_handlers::delete_item_handler),
         )
-        .route("/web/items/use/{id}", post(web_handlers::use_item_handler))
+        .route("/items/use/{id}", post(web_handlers::use_item_handler))
         .route(
-            "/web/items/purchase/{id}",
+            "/items/purchase/{id}",
             post(web_handlers::purchase_item_handler),
+        )
+        .layer(middleware::from_fn_with_state(shared_state.clone(), auth));
+
+    // Public routes that do not require authentication
+    let public_web_routes = Router::new()
+        .route(
+            "/signup",
+            get(web_handlers::show_signup_form).post(web_handlers::signup_handler),
+        )
+        .route(
+            "/login",
+            get(web_handlers::show_login_form).post(web_handlers::login_handler),
         );
+
+    let web_routes = Router::new()
+        .merge(protected_web_routes)
+        .merge(public_web_routes);
 
     let nested = env::var("RUN_ON_SUBPATH").unwrap_or_else(|_| "false".to_string()) == "true";
 
@@ -155,22 +168,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Router::new().nest(
             "/inventory",
             Router::new()
-                .merge(web)
-                .nest("/api", api_router)
-                .nest_service("/static", static_service)
-                .layer(middleware::from_fn_with_state(shared_state.clone(), auth)),
+                .route("/", get(|| async { Redirect::permanent("/inventory/web") }))
+                .nest("/web", web_routes)
+                .nest("/api", api_routes)
+                .nest_service("/static", static_service),
         )
     } else {
         Router::new()
-            .merge(web)
-            .nest("/api", api_router)
+            .route("/", get(|| async { Redirect::permanent("/web") }))
+            .nest("/web", web_routes)
+            .nest("/api", api_routes)
             .nest_service("/static", static_service)
-            .layer(middleware::from_fn_with_state(shared_state.clone(), auth))
     }
     .route("/health", get(health_check))
     .with_state(shared_state)
-    .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()))
-    .fallback(|| async { (StatusCode::NOT_FOUND, "Route Not Found") });
+    .fallback(|| async { (StatusCode::NOT_FOUND, "Route Not Found") })
+    .layer(TraceLayer::new_for_http())
+    .layer(middleware::from_fn(strip_trailing_slash));
 
     let port: u16 = env::var("APP_PORT")
         .unwrap_or_else(|_| "3000".into())

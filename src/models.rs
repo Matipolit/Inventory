@@ -1,5 +1,6 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, de};
 use sqlx::FromRow;
+use std::str::FromStr;
 use time::OffsetDateTime;
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
@@ -42,11 +43,27 @@ pub struct CreateCategoryPayload {
     pub color: String,
 }
 
+// Custom deserializer for optional fields from form data
+fn deserialize_empty_string_as_none<'de, D, T>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: FromStr,
+    T::Err: std::fmt::Display,
+{
+    let s = String::deserialize(deserializer)?;
+    if s.is_empty() {
+        Ok(None)
+    } else {
+        s.parse::<T>().map(Some).map_err(de::Error::custom)
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct CreateItemPayload {
     pub name: String,
     pub quantity: i32,
     pub restock_threshold: Option<i32>,
+    #[serde(deserialize_with = "deserialize_empty_string_as_none")]
     pub category_id: Option<i32>,
 }
 
