@@ -149,7 +149,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             post(web_handlers::purchase_item_handler),
         );
 
-    let app = if env::var("RUN_ON_SUBPATH").unwrap_or_else(|_| "false".to_string()) == "true" {
+    let nested = env::var("RUN_ON_SUBPATH").unwrap_or_else(|_| "false".to_string()) == "true";
+
+    let app = if nested {
         Router::new().nest(
             "/inventory",
             Router::new()
@@ -191,7 +193,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         "#
     );
-    tracing::info!("listening on {}", addr);
+    if !nested {
+        tracing::info!("listening on {}", addr);
+    } else {
+        tracing::info!("listening on {}/inventory", addr);
+    }
     serve(listener, app).await?;
 
     Ok(())
