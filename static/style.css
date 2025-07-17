@@ -1,10 +1,35 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Special+Gothic+Expanded+One&display=swap");
 body {
-    font-family: sans-serif;
+    font-family: "Inter", sans-serif;
+    color: #1d171d;
+    background-color: #f6f4f6;
+    margin: 0;
+}
+
+main {
     margin: 20px;
 }
+
 nav {
     margin-bottom: 20px;
+    background-color: #dbd1db;
+    padding: 8px;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
+
+footer {
+    margin-left: 20px;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+}
+
 table {
     border-collapse: collapse;
     width: 100%;
@@ -16,13 +41,14 @@ td {
     text-align: left;
 }
 th {
-    background-color: #f2f2f2;
+    background-color: #ede9ed;
 }
+
 .low-stock {
     background-color: #ffdddd;
 }
 .notifications {
-    background-color: #fff3cd;
+    background-color: #d1dc93;
     border: 1px solid #ffeeba;
     padding: 10px;
     margin-bottom: 20px;
@@ -33,21 +59,55 @@ th {
 form label {
     display: block;
     margin-bottom: 5px;
+    font-weight: 500;
 }
+
+form input {
+    font-family: "Inter", sans-serif;
+}
+
 form input[type="text"],
-form input[type="number"] {
+form input[type="number"],
+form select {
     padding: 8px;
     margin-bottom: 10px;
     box-sizing: border-box;
 }
-form button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
+
+form select {
+    font-family: "Inter", sans-serif;
+    background-color: #f6f4f6;
+    color: #1d171d;
+    border: 1px solid #1d171d;
 }
-form button:hover {
-    background-color: #0056b3;
+
+form input:focus,
+form select:focus {
+    outline: 2px solid #a38fa3;
+    border-color: #a38fa3;
+}
+
+form select {
+    font-family: "Inter", sans-serif;
+    background-color: #f6f4f6;
+    color: #1d171d;
+    border: 1px solid #1d171d;
+}
+
+form input {
+    border-style: solid;
+    background-color: #f6f4f6;
+}
+
+form input:focus,
+form select:focus {
+    outline: 2px solid #a38fa3;
+    border-color: #a38fa3;
+}
+
+form input:focus,
+form select:focus {
+    outline: 2px solid #a38fa3;
 }
 
 dialog > form {
@@ -60,35 +120,94 @@ button {
     align-items: center;
     padding: 10px 15px;
     gap: 4px;
-    background-color: #32a852;
-    color: white;
+    background-color: #a6b93c;
+    color: #1d171d;
     border: none;
     cursor: pointer;
-    font-family: sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
 }
 
+.btn:hover,
+button:hover {
+    background-color: #6f7b28;
+}
+
 .btn-danger {
-    background-color: #b82727;
+    background-color: #c85656;
 }
 
 .btn-danger:hover {
-    background-color: #871b1b;
+    background-color: #ba3c3c;
 }
 
-.btn-action {
-    background-color: #257d3d;
-}
+/* .btn-action { */
+/* background-color: #257d3d; */
+/* } */
 
-.btn-action:hover {
-    background-color: #1b5e2e;
-}
+/* .btn-action:hover { */
+/* background-color: #1b5e2e; */
+/* } */
 
 .btn-edit {
-    background-color: #2c4d9e;
+    background-color: #a38fa3;
 }
 
 .btn-edit:hover {
-    background-color: #192b57;
+    background-color: #917891;
+}
+
+#logo {
+    font-weight: 900;
+    margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: #e3dfe3;
+    }
+
+    body {
+        background-color: #1d171d;
+        color: #dde3dfe3;
+    }
+
+    nav {
+        background-color: #372f37;
+    }
+
+    .notifications {
+        background-color: #454d19;
+    }
+
+    th {
+        background-color: #4d424d;
+    }
+
+    form input {
+        background-color: #372f37;
+        color: #e3dfe3;
+        border-color: #4d424d;
+    }
+
+    form input:focus {
+        border-color: #e3dfe3;
+    }
+
+    form select {
+        background-color: #372f37;
+        color: #e3dfe3;
+        border-color: #4d424d;
+    }
+    dialog {
+        background-color: #1d171d;
+        color: #dde3dfe3;
+    }
 }

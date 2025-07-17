@@ -12,7 +12,7 @@
 {% endif %}
 <a
 style="margin: 12px 0px"
-class="btn btn-edit"
+class="btn"
 href="{{ base_path }}/web/categories/add"
 >Nowa kategoria</a
 >
@@ -39,7 +39,7 @@ href="{{ base_path }}/web/categories/add"
                             <td colspan="4" style="font-weight: bold; color: {{ category.text_color }};">{{ category.name }}</td>
                         </tr>
                         {% for item in category.items %}
-                            <tr style="background-color: {{ category.color | safe }}33; {% if item.quantity < item.restock_threshold %} border-left: 5px solid red; {% endif %}">
+                            <tr style="background-color: {{ category.color | safe }}33; {% if item.quantity < item.restock_threshold %} border-left: 5px solid #C85656; {% endif %}">
                                 <td>{{ item.name }}</td>
                                 <td>{{ item.quantity }}</td>
                                 <td>{{ item.restock_threshold }}</td>
@@ -47,7 +47,7 @@ href="{{ base_path }}/web/categories/add"
                                     <div style="display: flex; gap: 6px; align-items: center; align-content: stretch; flex-wrap: wrap;">
                                         <form action="{{ base_path }}/web/items/use/{{ item.id }}" method="post" style="display:inline;">
                                             <button class="btn-action" type="submit">
-                                                {{ icons::svg(name="use", width="20", height="20", aria_label="Use Item", color="#FFFFFF") }}<span>Użyj</span></button>
+                                                {{ icons::svg(name="use", width="20", height="20", aria_label="Use Item", color="#1D171D") }}<span>Użyj</span></button>
                                         </form>
 
                                         <dialog id="dialog-{{ item.id }}">
@@ -66,16 +66,16 @@ href="{{ base_path }}/web/categories/add"
                                             </form>
                                         </dialog>
                                         <button id="button-dialog-{{ item.id }}" class="btn-action">
-                                            {{ icons::svg(name="add", width="20", height="20", aria_label="Delete Item", color="#FFFFFF") }}<span>Dodaj</span>
+                                            {{ icons::svg(name="add", width="20", height="20", aria_label="Delete Item", color="#1D171D") }}<span>Dodaj</span>
                                         </button>
 
                                         <a class="btn btn-edit" href="{{ base_path }}/web/items/edit/{{ item.id }}">
-                                            {{ icons::svg(name="edit", width="20", height="20", aria_label="Edit Item", color="#FFFFFF") }}<span>Edytuj</span>
+                                            {{ icons::svg(name="edit", width="20", height="20", aria_label="Edit Item", color="#1D171D") }}<span>Edytuj</span>
                                         </a>
 
                                         <form action="{{ base_path }}/web/items/delete/{{ item.id }}" method="post" style="display:inline;">
                                             <button class="btn-danger" type="submit" onclick="return confirm('Czy na pewno chcesz usunąć {{ item.name }}?');">
-                                                {{ icons::svg(name="trash", width="20", height="20", aria_label="Delete Item", color="#FFFFFF") }}<span>Usuń</span>
+                                                {{ icons::svg(name="trash", width="20", height="20", aria_label="Delete Item", color="#1D171D") }}<span>Usuń</span>
                                             </button>
                                         </form>
                                     </div>
@@ -89,7 +89,7 @@ href="{{ base_path }}/web/categories/add"
                         <td colspan="4" style="font-weight: bold; color: white;">Brak kategorii</td>
                     </tr>
                     {% for item in grouped_items.uncategorized %}
-                        <tr {% if item.quantity < item.restock_threshold %} class="low-stock"{% endif %}>
+                        <tr style="{% if item.quantity < item.restock_threshold %} border-left: 5px solid #C85656; {% endif %}" >
                             <td>{{ item.name }}</td>
                             <td>{{ item.quantity }}</td>
                             <td>{{ item.restock_threshold }}</td>
@@ -97,7 +97,7 @@ href="{{ base_path }}/web/categories/add"
                                 <div style="display: flex; gap: 6px; align-items: center; align-content: stretch; flex-wrap: wrap;">
                                     <form action="{{ base_path }}/web/items/use/{{ item.id }}" method="post" style="display:inline;">
                                         <button class="btn-action" type="submit">
-                                            {{ icons::svg(name="use", width="20", height="20", aria_label="Use Item", color="#FFFFFF") }}<span>Użyj</span></button>
+                                            {{ icons::svg(name="use", width="20", height="20", aria_label="Use Item", color="#1D171D") }}<span>Użyj</span></button>
                                     </form>
 
                                     <dialog id="dialog-{{ item.id }}">
@@ -116,16 +116,16 @@ href="{{ base_path }}/web/categories/add"
                                         </form>
                                     </dialog>
                                     <button id="button-dialog-{{ item.id }}" class="btn-action">
-                                        {{ icons::svg(name="add", width="20", height="20", aria_label="Delete Item", color="#FFFFFF") }}<span>Dodaj</span>
+                                        {{ icons::svg(name="add", width="20", height="20", aria_label="Delete Item", color="#1D171D") }}<span>Dodaj</span>
                                     </button>
 
                                     <a class="btn btn-edit" href="{{ base_path }}/web/items/edit/{{ item.id }}">
-                                        {{ icons::svg(name="edit", width="20", height="20", aria_label="Edit Item", color="#FFFFFF") }}<span>Edytuj</span>
+                                        {{ icons::svg(name="edit", width="20", height="20", aria_label="Edit Item", color="#1D171D") }}<span>Edytuj</span>
                                     </a>
 
                                     <form action="{{ base_path }}/web/items/delete/{{ item.id }}" method="post" style="display:inline;">
                                         <button class="btn-danger" type="submit" onclick="return confirm('Czy na pewno chcesz usunąć {{ item.name }}?');">
-                                            {{ icons::svg(name="trash", width="20", height="20", aria_label="Delete Item", color="#FFFFFF") }}<span>Usuń</span>
+                                            {{ icons::svg(name="trash", width="20", height="20", aria_label="Delete Item", color="#1D171D") }}<span>Usuń</span>
                                         </button>
                                     </form>
                                 </div>
@@ -191,7 +191,7 @@ href="{{ base_path }}/web/categories/add"
     </table>
     <a
         style="margin-top: 12px"
-        class="btn btn-edit"
+        class="btn"
         href="{{ base_path }}/web/items/add"
         >Nowy przedmiot</a
     >

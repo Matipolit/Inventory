@@ -11,8 +11,13 @@
     <body>
         {% include "partials/_svg_sprite.html" ignore missing %}
         <nav>
-            {% if user %} Zalogowano jako {{ user.name }}
-            <a href="{{ base_path }}/web/logout">Wyloguj się</a>
+            <h2 id="logo">Inventory</h2>
+            {% if user %}
+            <div id="account-group">
+                <span>Zalogowano jako <b>{{ user.name }}</b></span>
+
+               <a class="btn btn-edit" href="{{ base_path }}/web/logout">Wyloguj się {{ icons::svg(name="logout", width="20", height="20", aria_label="Use Item", color="#1D171D") }} </a>
+            </div>
             {% endif %}
         </nav>
         <main>
@@ -21,7 +26,7 @@
                 <h3>Potrzeba uzupełnienia:</h3>
                 <ul>
                     {% for notif in notifications %}
-                    <li>{{ notif.item_name }}: {{ notif.message }}</li>
+                    <li><b>{{ notif.item_name }}</b>: {{ notif.message }}</li>
                     {% endfor %}
                 </ul>
             </div>
