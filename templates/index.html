@@ -85,8 +85,8 @@ href="{{ base_path }}/web/categories/add"
                     {% endif %}
                 {% endfor %}
                 {% if grouped_items.uncategorized %}
-                    <tr style="background-color: #808080;">
-                        <td colspan="4" style="font-weight: bold; color: white;">Brak kategorii</td>
+                    <tr style="background-color: #80808080;">
+                        <td colspan="4" style="font-weight: bold;">Brak kategorii</td>
                     </tr>
                     {% for item in grouped_items.uncategorized %}
                         <tr style="{% if item.quantity < item.restock_threshold %} border-left: 5px solid #C85656; {% endif %}" >

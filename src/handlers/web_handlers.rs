@@ -146,12 +146,14 @@ pub async fn show_add_item_form(
         .and_then(|c| c.value().parse().ok())
         .ok_or_else(|| AppError::BadRequest("Authentication required".into()))?;
 
+    let user = db_queries::get_user_by_id(&state.db_pool, user_id).await?;
     let notifications = get_notifications(&state.db_pool, user_id).await;
     let categories = get_all_categories(&state.db_pool, user_id).await?;
     let mut context = Context::new();
     context.insert("notifications", &notifications);
     context.insert("categories", &categories);
     context.insert("base_path", &state.base_path);
+    context.insert("user", &user);
     let rendered = state.tera.render("add_item.html", &context)?;
     Ok(Html(rendered))
 }
@@ -195,10 +197,12 @@ pub async fn show_add_category_form(
         .and_then(|c| c.value().parse().ok())
         .ok_or_else(|| AppError::BadRequest("Authentication required".into()))?;
 
+    let user = db_queries::get_user_by_id(&state.db_pool, user_id).await?;
     let notifications = get_notifications(&state.db_pool, user_id).await;
     let mut context = Context::new();
     context.insert("notifications", &notifications);
     context.insert("base_path", &state.base_path);
+    context.insert("user", &user);
     let rendered = state.tera.render("add_category.html", &context)?;
     Ok(Html(rendered))
 }
@@ -289,6 +293,7 @@ pub async fn show_edit_item_form(
         .and_then(|c| c.value().parse().ok())
         .ok_or_else(|| AppError::BadRequest("Authentication required".into()))?;
 
+    let user = db_queries::get_user_by_id(&state.db_pool, user_id).await?;
     let item = db_queries::get_item_by_id(&state.db_pool, user_id, item_id)
         .await?
         .ok_or(AppError::ItemNotFound)?;
@@ -300,6 +305,7 @@ pub async fn show_edit_item_form(
     context.insert("categories", &categories);
     context.insert("selected_category", &item.category.map(|c| c.id));
     context.insert("base_path", &state.base_path);
+    context.insert("user", &user);
     let rendered = state.tera.render("edit_item.html", &context)?;
     Ok(Html(rendered))
 }
